@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 Planer Bašte</title>
+<title>🌱 Pametni Planer Bašte</title>
 
 <style>
 body {
@@ -11,7 +11,7 @@ body {
   background: #121212;
   color: white;
   text-align: center;
-  padding: 20px;
+  padding: 15px;
 }
 
 h1 {
@@ -25,6 +25,7 @@ button {
   background: #4CAF50;
   color: white;
   font-size: 16px;
+  margin: 10px;
 }
 
 .card {
@@ -33,13 +34,28 @@ button {
   padding: 15px;
   border-radius: 12px;
 }
+
+select {
+  padding: 10px;
+  border-radius: 8px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🌱 Planer Bašte</h1>
-<p>Tvoj sanduk: 3m x 1.5m</p>
+<h1>🌱 Pametni Planer Bašte</h1>
+
+<p>Izaberi mesec:</p>
+
+<select id="mesec">
+  <option value="3">Mart</option>
+  <option value="4" selected>April</option>
+  <option value="5">Maj</option>
+  <option value="6">Jun</option>
+</select>
+
+<br>
 
 <button onclick="plan()">Napravi plan</button>
 
@@ -47,14 +63,55 @@ button {
 
 <script>
 function plan() {
-  document.getElementById("rezultat").innerHTML = `
+
+  let mesec = document.getElementById("mesec").value;
+
+  let sadnja = "";
+  let zalivanje = "";
+  let saveti = "";
+
+  if (mesec == 3) {
+    sadnja = "Spanać, luk, grašak";
+    zalivanje = "Slabo, zemlja je još vlažna";
+    saveti = "Zaštiti od mraza";
+  }
+
+  if (mesec == 4) {
+    sadnja = "Salata, rotkvica, šargarepa";
+    zalivanje = "2-3 puta nedeljno";
+    saveti = "Idealno vreme za setvu";
+  }
+
+  if (mesec == 5) {
+    sadnja = "Paradajz, paprika, tikvice";
+    zalivanje = "Svaka 2 dana";
+    saveti = "Dodaj kompost";
+  }
+
+  if (mesec == 6) {
+    sadnja = "Krastavac, boranija";
+    zalivanje = "Svaki dan po vrućini";
+    saveti = "Malčiraj zemlju";
+  }
+
+  let html = `
   <div class="card">📏 Površina: 4.5 m²</div>
 
-  <div class="card">🍅 Paradajz + Bosiljak</div>
-  <div class="card">🥕 Šargarepa + Crni luk</div>
-  <div class="card">🥬 Salata + Rotkvica</div>
-  <div class="card">🌿 Peršun + Spanać</div>
+  <div class="card">🌱 Šta saditi:<br>${sadnja}</div>
+
+  <div class="card">💧 Zalivanje:<br>${zalivanje}</div>
+
+  <div class="card">🧠 Savet:<br>${saveti}</div>
+
+  <div class="card">
+  🍅 Raspored:
+  <br>Paradajz + Bosiljak
+  <br>Šargarepa + Luk
+  <br>Salata + Rotkvica
+  </div>
   `;
+
+  document.getElementById("rezultat").innerHTML = html;
 }
 </script>
 
