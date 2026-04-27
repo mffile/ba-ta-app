@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 Bašta Grid Level 3</title>
+<title>🌱 Bašta Level 4 AI</title>
 
 <style>
 body {
   font-family: Arial;
-  background: #121212;
+  background: #0f0f0f;
   color: white;
   text-align: center;
   padding: 10px;
@@ -16,7 +16,7 @@ body {
 
 h1 { color: #4CAF50; }
 
-input {
+input, select {
   padding: 8px;
   margin: 5px;
   border-radius: 8px;
@@ -24,7 +24,7 @@ input {
 
 button {
   padding: 10px;
-  margin: 5px;
+  margin: 6px;
   border-radius: 10px;
   border: none;
   background: #4CAF50;
@@ -49,56 +49,71 @@ button {
   border: 1px solid #333;
 }
 
-.good { background: #1e1e1e; }
-.sun { background: #2c2c1a; }
-.warn { background: #3a1f1f; }
+.sun { background: #2b2b16; }
+.shade { background: #1c1c1c; }
+.warn { background: #3a1a1a; }
 
-.info {
-  margin-top: 10px;
-  font-size: 14px;
+.card {
+  background: #1a1a1a;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🌱 Bašta Grid Level 3</h1>
+<h1>🌱 Bašta Level 4 AI</h1>
 
-<input id="duzina" type="number" value="3" step="0.5"> Dužina (m)
-<input id="sirina" type="number" value="1.5" step="0.5"> Širina (m)
+<input id="d" type="number" value="3" step="0.5"> Dužina
+<input id="s" type="number" value="1.5" step="0.5"> Širina
 
 <br>
 
-<button onclick="crtaj()">🧠 Generiši pametni grid</button>
+<select id="mesec">
+  <option value="3">Mart</option>
+  <option value="4" selected>April</option>
+  <option value="5">Maj</option>
+  <option value="6">Jun</option>
+</select>
+
+<br>
+
+<button onclick="run()">🤖 Generiši AI plan</button>
 
 <div id="info"></div>
 <div id="grid" class="grid"></div>
 
 <script>
 
-const biljke = [
-  { ime: "🍅", name: "paradajz", sun: true },
-  { ime: "🌿", name: "bosiljak", sun: true },
-  { ime: "🥕", name: "šargarepa", sun: false },
-  { ime: "🥬", name: "salata", sun: false },
-  { ime: "🧅", name: "luk", sun: true }
+const plants = [
+  { e:"🍅", n:"paradajz", sun:true, water:"srednje", yield:4 },
+  { e:"🌿", n:"bosiljak", sun:true, water:"srednje", yield:1 },
+  { e:"🥕", n:"šargarepa", sun:false, water:"malo", yield:3 },
+  { e:"🥬", n:"salata", sun:false, water:"malo", yield:2 },
+  { e:"🧅", n:"luk", sun:true, water:"malo", yield:2 }
 ];
 
-// loše kombinacije
-const warnPairs = [
-  ["paradajz", "luk"]
-];
-
-function losaKombinacija(a, b) {
-  return warnPairs.some(p =>
-    (p[0] === a && p[1] === b) || (p[0] === b && p[1] === a)
-  );
+function weatherHint(m) {
+  if(m == 3) return "🌧 hladno + vlaga";
+  if(m == 4) return "🌤 idealno proleće";
+  if(m == 5) return "☀ toplo i suvo";
+  if(m == 6) return "🔥 vruće leto";
 }
 
-function crtaj() {
+function waterPlan(m) {
+  if(m == 3) return "1-2x nedeljno";
+  if(m == 4) return "2-3x nedeljno";
+  if(m == 5) return "svaka 2 dana";
+  if(m == 6) return "svaki dan";
+}
 
-  let d = parseFloat(document.getElementById("duzina").value);
-  let s = parseFloat(document.getElementById("sirina").value);
+function run() {
+
+  let d = +document.getElementById("d").value;
+  let s = +document.getElementById("s").value;
+  let m = +document.getElementById("mesec").value;
 
   let cols = Math.round(d * 2);
   let rows = Math.round(s * 2);
@@ -108,39 +123,38 @@ function crtaj() {
 
   let html = "";
   let i = 0;
+  let totalYield = 0;
 
-  let problem = false;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
+      let p = plants[i % plants.length];
+      i++;
 
-      let b1 = biljke[i % biljke.length];
-      let b2 = biljke[(i + 1) % biljke.length];
+      totalYield += p.yield;
 
-      let warn = losaKombinacija(b1.name, b2.name);
+      let sunZone = r < rows/2;
 
-      let sun = (r < rows / 2); // gornja zona više sunca
-
-      let cls = warn ? "warn" : (sun ? "sun" : "good");
-
-      if (warn) problem = true;
+      let cls = sunZone ? "sun" : "shade";
 
       html += `<div class="cell ${cls}">
-        ${b1.ime}
+        ${p.e}
       </div>`;
-
-      i++;
     }
   }
 
   grid.innerHTML = html;
 
+  let weather = weatherHint(m);
+  let water = waterPlan(m);
+
+  let best = "🥬 salata + 🥕 šargarepa (najstabilnije)";
+
   document.getElementById("info").innerHTML = `
-    <div class="info">
-      📏 Grid: ${cols} × ${rows}<br>
-      ☀ Gornja zona = više sunca<br>
-      ${problem ? "⚠ UPOZORENJE: loše kombinacije detektovane!" : "✅ Sve kombinacije OK"}
-    </div>
+    <div class="card">🌦 Vreme: ${weather}</div>
+    <div class="card">💧 Zalivanje: ${water}</div>
+    <div class="card">📊 Procena prinosa: ~${totalYield} jedinica</div>
+    <div class="card">🤖 AI preporuka: ${best}</div>
   `;
 }
 
