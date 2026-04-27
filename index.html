@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 Bašta Level 2</title>
+<title>🌱 Bašta Grid 2.5</title>
 
 <style>
 body {
@@ -11,143 +11,108 @@ body {
   background: #121212;
   color: white;
   text-align: center;
-  padding: 15px;
+  padding: 10px;
 }
 
 h1 { color: #4CAF50; }
 
+input {
+  padding: 8px;
+  margin: 5px;
+  border-radius: 8px;
+}
+
 button {
-  padding: 12px;
-  margin: 8px;
+  padding: 10px;
+  margin: 5px;
   border-radius: 10px;
   border: none;
   background: #4CAF50;
   color: white;
-  font-size: 16px;
 }
 
-.card {
+.grid {
+  display: grid;
+  gap: 4px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
   background: #1e1e1e;
-  margin: 10px;
-  padding: 15px;
-  border-radius: 12px;
+  border: 1px solid #333;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-select {
-  padding: 10px;
-  border-radius: 8px;
+.legend {
+  margin-top: 10px;
+  font-size: 14px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🌱 Bašta Level 2</h1>
+<h1>🌱 Bašta Grid 2.5</h1>
 
-<p>Sanduk: 3m × 1.5m</p>
-
-<select id="mesec">
-  <option value="3">Mart</option>
-  <option value="4" selected>April</option>
-  <option value="5">Maj</option>
-  <option value="6">Jun</option>
-</select>
+<input id="duzina" type="number" value="3" step="0.5"> Dužina (m)
+<input id="sirina" type="number" value="1.5" step="0.5"> Širina (m)
 
 <br>
 
-<button onclick="plan()">📌 Napravi plan</button>
-<button onclick="savePlan()">💾 Sačuvaj</button>
-<button onclick="loadPlan()">📂 Učitaj</button>
-<button onclick="notify()">🔔 Podsetnik</button>
+<button onclick="crtaj()">🧱 Nacrtaj baštu</button>
 
-<div id="rezultat"></div>
+<div id="info"></div>
+<div id="grid" class="grid"></div>
 
 <script>
 
-function plan() {
-  let m = document.getElementById("mesec").value;
+function crtaj() {
 
-  let sadnja = "";
-  let voda = "";
-  let vreme = "";
-  let zemlja = "";
+  let d = parseFloat(document.getElementById("duzina").value);
+  let s = parseFloat(document.getElementById("sirina").value);
 
-  if (m == 3) {
-    sadnja = "Spanać, luk, grašak";
-    voda = "Slabo zalivanje";
-    vreme = "Hladno / mraz moguć";
-    zemlja = "Donji sloj: grane + kompost";
-  }
+  // svaki 0.5m = 1 ćelija
+  let cols = Math.round(d * 2);
+  let rows = Math.round(s * 2);
 
-  if (m == 4) {
-    sadnja = "Salata, rotkvica, šargarepa";
-    voda = "2-3x nedeljno";
-    vreme = "Idealno proleće";
-    zemlja = "Kompost + zemlja (50/50)";
-  }
+  let ukupno = cols * rows;
 
-  if (m == 5) {
-    sadnja = "Paradajz, paprika, tikvica";
-    voda = "svaka 2 dana";
-    vreme = "Toplo vreme";
-    zemlja = "Bogata zemlja + humus";
-  }
+  let biljke = [
+    "🍅", "🌿", "🥕", "🥬", "🧅"
+  ];
 
-  if (m == 6) {
-    sadnja = "Krastavac, boranija";
-    voda = "svaki dan";
-    vreme = "Vruće leto";
-    zemlja = "Malč obavezno";
-  }
+  let html = "";
+  let grid = document.getElementById("grid");
 
-  let html = `
-  <div class="card">🌱 Sadnja:<br>${sadnja}</div>
-  <div class="card">💧 Zalivanje:<br>${voda}</div>
-  <div class="card">🌦 Vreme:<br>${vreme}</div>
-  <div class="card">🧱 Zemlja:<br>${zemlja}</div>
+  grid.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
 
-  <div class="card">
-  🍅 Raspored:
-  <br>Paradajz + Bosiljak
-  <br>Šargarepa + Luk
-  <br>Salata + Rotkvica
-  </div>
-  `;
+  let i = 0;
 
-  document.getElementById("rezultat").innerHTML = html;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
 
-  localStorage.setItem("plan", html);
-}
+      let biljka = biljke[i % biljke.length];
+      i++;
 
-// 💾 SAVE
-function savePlan() {
-  alert("Plan sačuvan u telefonu 💾");
-}
-
-// 📂 LOAD
-function loadPlan() {
-  let data = localStorage.getItem("plan");
-  if (data) {
-    document.getElementById("rezultat").innerHTML = data;
-  } else {
-    alert("Nema sačuvanog plana");
-  }
-}
-
-// 🔔 NOTIFIKACIJE
-function notify() {
-  if (!("Notification" in window)) {
-    alert("Browser ne podržava notifikacije");
-    return;
-  }
-
-  Notification.requestPermission().then(p => {
-    if (p === "granted") {
-      new Notification("🌱 Bašta", {
-        body: "Vreme je da proveriš biljke!"
-      });
+      html += `<div class="cell">${biljka}</div>`;
     }
-  });
+  }
+
+  grid.innerHTML = html;
+
+  document.getElementById("info").innerHTML = `
+    <div class="legend">
+    📏 Grid: ${cols} × ${rows}<br>
+    🌱 Ukupno mesta: ${ukupno}<br>
+    🍅 Svaka ćelija = 0.5m × 0.5m
+    </div>
+  `;
 }
 
 </script>
