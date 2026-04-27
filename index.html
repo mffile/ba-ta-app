@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 Bašta Grid 2.5</title>
+<title>🌱 Bašta Grid Level 3</title>
 
 <style>
 body {
@@ -33,23 +33,27 @@ button {
 
 .grid {
   display: grid;
-  gap: 4px;
-  margin-top: 15px;
+  gap: 3px;
   justify-content: center;
+  margin-top: 15px;
 }
 
 .cell {
-  width: 50px;
-  height: 50px;
-  background: #1e1e1e;
-  border: 1px solid #333;
-  font-size: 10px;
+  width: 55px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #333;
 }
 
-.legend {
+.good { background: #1e1e1e; }
+.sun { background: #2c2c1a; }
+.warn { background: #3a1f1f; }
+
+.info {
   margin-top: 10px;
   font-size: 14px;
 }
@@ -58,59 +62,84 @@ button {
 
 <body>
 
-<h1>🌱 Bašta Grid 2.5</h1>
+<h1>🌱 Bašta Grid Level 3</h1>
 
 <input id="duzina" type="number" value="3" step="0.5"> Dužina (m)
 <input id="sirina" type="number" value="1.5" step="0.5"> Širina (m)
 
 <br>
 
-<button onclick="crtaj()">🧱 Nacrtaj baštu</button>
+<button onclick="crtaj()">🧠 Generiši pametni grid</button>
 
 <div id="info"></div>
 <div id="grid" class="grid"></div>
 
 <script>
 
+const biljke = [
+  { ime: "🍅", name: "paradajz", sun: true },
+  { ime: "🌿", name: "bosiljak", sun: true },
+  { ime: "🥕", name: "šargarepa", sun: false },
+  { ime: "🥬", name: "salata", sun: false },
+  { ime: "🧅", name: "luk", sun: true }
+];
+
+// loše kombinacije
+const warnPairs = [
+  ["paradajz", "luk"]
+];
+
+function losaKombinacija(a, b) {
+  return warnPairs.some(p =>
+    (p[0] === a && p[1] === b) || (p[0] === b && p[1] === a)
+  );
+}
+
 function crtaj() {
 
   let d = parseFloat(document.getElementById("duzina").value);
   let s = parseFloat(document.getElementById("sirina").value);
 
-  // svaki 0.5m = 1 ćelija
   let cols = Math.round(d * 2);
   let rows = Math.round(s * 2);
 
-  let ukupno = cols * rows;
-
-  let biljke = [
-    "🍅", "🌿", "🥕", "🥬", "🧅"
-  ];
+  let grid = document.getElementById("grid");
+  grid.style.gridTemplateColumns = `repeat(${cols}, 55px)`;
 
   let html = "";
-  let grid = document.getElementById("grid");
-
-  grid.style.gridTemplateColumns = `repeat(${cols}, 50px)`;
-
   let i = 0;
+
+  let problem = false;
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
 
-      let biljka = biljke[i % biljke.length];
-      i++;
+      let b1 = biljke[i % biljke.length];
+      let b2 = biljke[(i + 1) % biljke.length];
 
-      html += `<div class="cell">${biljka}</div>`;
+      let warn = losaKombinacija(b1.name, b2.name);
+
+      let sun = (r < rows / 2); // gornja zona više sunca
+
+      let cls = warn ? "warn" : (sun ? "sun" : "good");
+
+      if (warn) problem = true;
+
+      html += `<div class="cell ${cls}">
+        ${b1.ime}
+      </div>`;
+
+      i++;
     }
   }
 
   grid.innerHTML = html;
 
   document.getElementById("info").innerHTML = `
-    <div class="legend">
-    📏 Grid: ${cols} × ${rows}<br>
-    🌱 Ukupno mesta: ${ukupno}<br>
-    🍅 Svaka ćelija = 0.5m × 0.5m
+    <div class="info">
+      📏 Grid: ${cols} × ${rows}<br>
+      ☀ Gornja zona = više sunca<br>
+      ${problem ? "⚠ UPOZORENJE: loše kombinacije detektovane!" : "✅ Sve kombinacije OK"}
     </div>
   `;
 }
