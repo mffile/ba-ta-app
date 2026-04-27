@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌱 Planer Bašte</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #121212;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  color: #4CAF50;
+}
+
+button {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  font-size: 16px;
+}
+
+.card {
+  background: #1e1e1e;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌱 Planer Bašte</h1>
+<p>Tvoj sanduk: 3m x 1.5m</p>
+
+<button onclick="plan()">Napravi plan</button>
+
+<div id="rezultat"></div>
+
+<script>
+function plan() {
+  document.getElementById("rezultat").innerHTML = `
+  <div class="card">📏 Površina: 4.5 m²</div>
+
+  <div class="card">🍅 Paradajz + Bosiljak</div>
+  <div class="card">🥕 Šargarepa + Crni luk</div>
+  <div class="card">🥬 Salata + Rotkvica</div>
+  <div class="card">🌿 Peršun + Spanać</div>
+  `;
+}
+</script>
+
+</body>
+</html>
